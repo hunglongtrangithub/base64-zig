@@ -9,16 +9,19 @@ var stdin_buffer: [1024]u8 = undefined;
 var stdin_reader = std.fs.File.stdin().reader(&stdin_buffer);
 
 pub fn main() !void {
-    try stdout_writer.interface.print("Base64 Encoder/Decoder\n", .{});
-    try stdout_writer.interface.print("Enter your input. Maximum size is 1024 bytes.\n", .{});
-    try stdout_writer.interface.print("Press Ctrl+D (Unix) or Ctrl+Z (Windows) to exit.\n\n", .{});
-    try stdout_writer.interface.flush();
+    const stdout = &stdout_writer.interface;
+    const stdin = &stdin_reader.interface;
+
+    try stdout.print("Base64 Encoder/Decoder\n", .{});
+    try stdout.print("Enter your input. Maximum size is 1024 bytes.\n", .{});
+    try stdout.print("Press Ctrl+D (Unix) or Ctrl+Z (Windows) to exit.\n\n", .{});
+    try stdout.flush();
 
     while (true) {
-        try stdout_writer.interface.print("Input: ", .{});
-        try stdout_writer.interface.flush();
+        try stdout.print("Input: ", .{});
+        try stdout.flush();
 
-        const input = stdin_reader.interface.takeDelimiterExclusive('\n') catch |err| {
+        const input = stdin.takeDelimiterExclusive('\n') catch |err| {
             switch (err) {
                 error.EndOfStream => {
                     std.debug.print("\nEnd of input detected. Exiting.\n", .{});
@@ -49,9 +52,9 @@ pub fn main() !void {
         };
         defer allocator.free(decoded);
 
-        try stdout_writer.interface.print("Encoded: {s}\n", .{encoded});
-        try stdout_writer.interface.print("Decoded: {s}\n", .{decoded});
-        try stdout_writer.interface.print("----------\n", .{});
-        try stdout_writer.interface.flush();
+        try stdout.print("Encoded: {s}\n", .{encoded});
+        try stdout.print("Decoded: {s}\n", .{decoded});
+        try stdout.print("----------\n", .{});
+        try stdout.flush();
     }
 }
