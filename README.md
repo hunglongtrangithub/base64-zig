@@ -1,6 +1,6 @@
 # Base64 Encoder/Decoder
 
-A simple Base64 encoder and decoder project implemented in Zig. This is my first Zig project, and is intended to help me get used to the language.
+A simple Base64 encoder and decoder project implemented in Zig. This is my first Zig project, and is intended to help me get used to the language. The specification followed is [RFC 4648](https://tools.ietf.org/html/rfc4648).
 
 ## Usage
 
