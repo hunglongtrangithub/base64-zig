@@ -1,12 +1,13 @@
-//! This module defines the Base64 encoding table as a constant array.
+//! This module defines the Base64 module with encoding and decoding functionalities.
+
 const std = @import("std");
+
 const table = @import("table.zig");
 const encoder = @import("encode.zig");
 const decoder = @import("decode.zig");
 
-const TABLE = table.TABLE;
+pub const TABLE = table.TABLE;
 pub const PAD_CHAR = table.PAD_CHAR;
-
 pub const encode = encoder.encode;
 pub const decode = decoder.decode;
 
@@ -37,5 +38,6 @@ test "base64 encode/decode roundtrip" {
 }
 
 test {
+    // Make all tests in other files imported by this module available during testing
     std.testing.refAllDecls(@This());
 }

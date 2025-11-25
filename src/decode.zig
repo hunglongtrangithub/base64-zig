@@ -1,17 +1,24 @@
 const std = @import("std");
 const table = @import("table.zig");
 
+/// Errors that can occur during Base64 decoding.
 const DecodeError = error{
+    /// The input length (after trimming padding) is invalid for decoding.
+    /// This occurs when the length mod 4 is 1 (after trimming padding).
     InvalidLength,
+    /// Padding character found in a non-final chunk, or incorrect amount of
+    /// trailing padding characters for the final chunk.
     InvalidPadding,
+    /// An invalid base64 character was encountered.
     InvalidCharacter,
 };
 
-/// Helpers to get the index of a base64 character, or return an error if invalid.
+/// Helper to get the index of a base64 character, or return an error if invalid.
 fn getIndex(c: u8) DecodeError!u8 {
     return table.getTableIndex(c) orelse return DecodeError.InvalidCharacter;
 }
 
+/// Decodes the input Base64 encoded byte slice into its original byte slice.
 pub fn decode(input: []const u8, allocator: std.mem.Allocator) (DecodeError || std.mem.Allocator.Error)![]u8 {
     // Ignore trailing padding characters
     const input_len = blk: {
@@ -31,6 +38,7 @@ pub fn decode(input: []const u8, allocator: std.mem.Allocator) (DecodeError || s
     const num_chunks = input_len / 4;
     const remainder_len = input_len % 4;
 
+    // Output length depends on remainder length
     const output_len = switch (remainder_len) {
         0 => 3 * num_chunks,
         // Only one base64 char, not enough to form a byte
@@ -52,6 +60,7 @@ pub fn decode(input: []const u8, allocator: std.mem.Allocator) (DecodeError || s
     var output = try allocator.alloc(u8, output_len);
     errdefer allocator.free(output); // Free output buffer on error
 
+    // Process each full chunk of 4 base64 characters
     for (0..num_chunks) |i| {
         for (0..4) |j| {
             const c = input[i * 4 + j];
@@ -71,6 +80,7 @@ pub fn decode(input: []const u8, allocator: std.mem.Allocator) (DecodeError || s
         output[i * 3 + 2] = (b2 << 6) | b3;
     }
 
+    // Handle remaining base64 characters
     switch (remainder_len) {
         0 => {},
         2 => {

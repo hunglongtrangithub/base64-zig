@@ -22,11 +22,11 @@ pub fn main() !void {
             switch (err) {
                 error.EndOfStream => {
                     std.debug.print("\nEnd of input detected. Exiting.\n", .{});
-                    return;
+                    break;
                 },
                 error.ReadFailed => {
                     std.debug.print("Error reading input. Exiting.\n", .{});
-                    return;
+                    break;
                 },
                 error.StreamTooLong => {
                     std.debug.print("Input too long. Please limit to 1024 bytes.\n", .{});

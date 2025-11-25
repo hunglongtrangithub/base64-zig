@@ -1,8 +1,12 @@
 const std = @import("std");
 
+/// Base64 encoding table
 pub const TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+/// Base64 padding character
 pub const PAD_CHAR: u8 = '=';
 
+/// Get the index of a Base64 character in the encoding table
+/// Returns null if the character is not found in the table
 pub fn getTableIndex(c: u8) ?u8 {
     switch (c) {
         'A'...'Z' => return c - 'A',

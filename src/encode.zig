@@ -4,18 +4,23 @@ const table = @import("table.zig");
 const TABLE = table.TABLE;
 const PAD_CHAR: u8 = table.PAD_CHAR;
 
+/// Mask to extract lower 6 bits of a byte
 const MASK_6_BITS: u8 = 0b0011_1111;
 
+/// Encodes the input byte slice into a Base64 encoded byte slice.
 pub fn encode(input: []const u8, allocator: std.mem.Allocator) ![]u8 {
+    // Group input into chunks of 3 bytes
     const num_chunks = input.len / 3;
     const remainder_len = input.len % 3;
 
+    // Output length is always a multiple of 4
     const output_len: usize = if (remainder_len == 0)
         num_chunks * 4
     else
         (num_chunks + 1) * 4;
     var output = try allocator.alloc(u8, output_len);
 
+    // Process each full chunk of 3 bytes
     for (0..num_chunks) |i| {
         const b0 = input[i * 3];
         const b1 = input[i * 3 + 1];
@@ -27,6 +32,7 @@ pub fn encode(input: []const u8, allocator: std.mem.Allocator) ![]u8 {
         output[i * 4 + 3] = TABLE[b2 & MASK_6_BITS];
     }
 
+    // Handle remaining bytes and padding
     switch (remainder_len) {
         0 => {},
         1 => {
