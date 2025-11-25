@@ -38,12 +38,20 @@ pub fn main() !void {
         const encoded = try base64.encode(input, allocator);
         defer allocator.free(encoded);
 
-        const decoded = base64.decode(input, allocator) catch |err|
-            try std.fmt.allocPrint(allocator, "Decoding failed: {}\n", .{err});
+        const decoded = base64.decode(input, allocator) catch |err| blk: {
+            const err_msg = switch (err) {
+                error.InvalidCharacter => "Input contains invalid Base64 characters.",
+                error.InvalidPadding => "Input has incorrect padding.",
+                error.InvalidLength => "Input length is not valid for Base64 decoding.",
+                error.OutOfMemory => return err,
+            };
+            break :blk try std.fmt.allocPrint(allocator, "<Decoding failed: {s}>", .{err_msg});
+        };
         defer allocator.free(decoded);
 
         try stdout_writer.interface.print("Encoded: {s}\n", .{encoded});
         try stdout_writer.interface.print("Decoded: {s}\n", .{decoded});
+        try stdout_writer.interface.print("----------\n", .{});
         try stdout_writer.interface.flush();
     }
 }
