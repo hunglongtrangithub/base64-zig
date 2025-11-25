@@ -45,7 +45,7 @@ pub fn main() !void {
             const err_msg = switch (err) {
                 error.InvalidCharacter => "Input contains invalid Base64 characters.",
                 error.InvalidPadding => "Input has incorrect padding.",
-                error.InvalidLength => "Input length is not valid for Base64 decoding.",
+                error.InvalidLength => "Input length (after trimming) is not valid for Base64 decoding.",
                 error.OutOfMemory => return err,
             };
             break :blk try std.fmt.allocPrint(allocator, "<Decoding failed: {s}>", .{err_msg});
