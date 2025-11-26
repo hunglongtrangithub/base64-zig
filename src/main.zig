@@ -32,6 +32,11 @@ pub fn main() !void {
                 },
                 error.StreamTooLong => {
                     std.debug.print("Input too long. Please limit to 1024 bytes.\n", .{});
+                    // Discard the rest of the line
+                    while (true) {
+                        const ch = try stdin.takeByte();
+                        if (ch == '\n') break;
+                    }
                     continue;
                 },
             }
